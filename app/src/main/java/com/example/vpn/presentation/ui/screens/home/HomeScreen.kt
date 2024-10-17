@@ -1,8 +1,10 @@
 package com.example.vpn.presentation.ui.screens.home
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -122,7 +124,8 @@ fun HomeScreen() {
                             .clip(RoundedCornerShape(5.dp))
                             .width(35.dp)
                             .height(30.dp)
-                            .background(Color(0XFF3a3a4d)), contentAlignment = Alignment.Center
+                            .background(Color(0XFF3a3a4d)),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Menu,
@@ -142,7 +145,8 @@ fun HomeScreen() {
                     Image(
                         painter = painterResource(id = R.drawable.premium),
                         contentDescription = "",
-                        contentScale = ContentScale.Crop, modifier = Modifier.size(40.dp)
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(40.dp)
                     )
 
                 }
@@ -156,6 +160,25 @@ fun HomeScreen() {
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 28.dp, end = 28.dp)
+                        .height(90.dp)
+                        .border(
+                            BorderStroke(1.dp, color = Color.LightGray),
+                            shape = RoundedCornerShape(12.dp)
+                        ), contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                    }
+                }
             }
         }
     }
