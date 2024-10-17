@@ -70,7 +70,7 @@ fun HomeScreen() {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet(drawerContainerColor = Color(0XFF2f2f3e).copy(0.9f)) {
+            ModalDrawerSheet(drawerContainerColor = Color(0XFF2f2f3e).copy(0.95f)) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
