@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,37 +18,33 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.ArrowCircleDown
-import androidx.compose.material.icons.filled.ArrowCircleUp
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Power
-import androidx.compose.material.icons.filled.PowerSettingsNew
+import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Upload
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.VpnKey
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -58,9 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vpn.R
 import com.example.vpn.domain.model.vpn.VpnDataResponse
-import com.example.vpn.domain.usecase.ResultState
-import com.example.vpn.presentation.viewmodel.MainViewModel
-import org.koin.compose.koinInject
+import kotlinx.coroutines.launch
+import org.koin.compose.rememberCurrentKoinScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -69,22 +65,84 @@ fun HomeScreen() {
     var isLoading by remember { mutableStateOf(false) }
     var vpnData by remember { mutableStateOf<VpnDataResponse?>(null) }
     val isConnected = true
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF2E2E3D)),
-        horizontalAlignment = Alignment.CenterHorizontally
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(drawerContainerColor = Color(0XFF2f2f3e).copy(0.9f)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(vertical = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    DrawerMenuItem(
+                        icon = Icons.Default.VpnKey,
+                        label = "VPN",
+                        onClick = {}
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    DrawerMenuItem(
+                        icon = Icons.Default.PrivacyTip,
+                        label = "Privacy Policy",
+                        onClick = {}
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                }
+            }
+        }
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF2E2E3D)),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            BackgroundImage()
-            MainContent(isConnected = isConnected)
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                BackgroundImage()
+                MainContent(isConnected = isConnected, drawerState)
+            }
         }
     }
+
+
 }
+
+
+@Composable
+fun DrawerMenuItem(icon: ImageVector, label: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = Color.White,
+            modifier = Modifier.size(24.dp)
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Text(
+            text = label,
+            color = Color.White,
+            fontSize = 16.sp
+        )
+    }
+}
+
 
 @Composable
 fun BackgroundImage() {
@@ -107,13 +165,13 @@ fun BackgroundImage() {
 }
 
 @Composable
-fun MainContent(isConnected: Boolean) {
+fun MainContent(isConnected: Boolean, drawerState: DrawerState) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TopBar()
+        TopBar(drawerState)
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -130,7 +188,8 @@ fun MainContent(isConnected: Boolean) {
 }
 
 @Composable
-fun TopBar() {
+fun TopBar(drawerState: DrawerState) {
+    val scope = rememberCoroutineScope()
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -139,7 +198,11 @@ fun TopBar() {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         IconButton(
-            onClick = { },
+            onClick = {
+                scope.launch {
+                    drawerState.open()
+                }
+            },
             modifier = Modifier
                 .clip(RoundedCornerShape(5.dp))
                 .size(40.dp)
