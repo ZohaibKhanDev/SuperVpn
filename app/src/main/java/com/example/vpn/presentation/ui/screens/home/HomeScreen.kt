@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -145,6 +146,16 @@ fun HomeScreen() {
                     )
 
                 }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(text = "Connecting Time", fontSize = 12.sp, color = Color.LightGray)
+                Text(
+                    text = "00:30:26",
+                    fontSize = 34.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
             }
         }
     }
