@@ -11,17 +11,29 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: Repository) : ViewModel() {
-    private val _allVpnData = MutableStateFlow<ResultState<VpnDataResponse>>(ResultState.Loading)
-    val allVpnData: StateFlow<ResultState<VpnDataResponse>> = _allVpnData.asStateFlow()
+    private val _allVpnData = MutableStateFlow<ResultState<VpnDataResponse?>>(ResultState.Loading)
+    val allVpnData: StateFlow<ResultState<VpnDataResponse?>> = _allVpnData.asStateFlow()
 
-    fun getAllVpnData() {
+    private val _isConnected = MutableStateFlow(false)
+    val isConnected: StateFlow<Boolean> = _isConnected
+
+    fun connectVpn() {
         viewModelScope.launch {
-            _allVpnData.value = ResultState.Loading
             try {
                 val response = repository.getVpnData()
                 _allVpnData.value = ResultState.Success(response)
+                _isConnected.value = true
             } catch (e: Exception) {
                 _allVpnData.value = ResultState.Error(e)
+            }
+        }
+    }
+
+    fun disconnectVpn() {
+        viewModelScope.launch {
+            try {
+                _isConnected.value = false
+            } catch (e: Exception) {
             }
         }
     }
