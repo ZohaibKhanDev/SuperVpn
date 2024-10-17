@@ -103,6 +103,7 @@ fun HomeScreen() {
                 .background(Color(0xFF2E2E3D)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
