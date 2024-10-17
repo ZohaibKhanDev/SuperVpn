@@ -17,12 +17,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.ArrowCircleDown
+import androidx.compose.material.icons.filled.ArrowCircleUp
+import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Power
+import androidx.compose.material.icons.filled.PowerSettingsNew
+import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -49,65 +62,37 @@ import com.example.vpn.presentation.viewmodel.MainViewModel
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("MutableCollectionMutableState", "UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen() {
-    var isLoading by remember {
-        mutableStateOf(false)
-    }
+    var isLoading by remember { mutableStateOf(false) }
+    var vpnData by remember { mutableStateOf<VpnDataResponse?>(null) }
 
-    val viewModel: MainViewModel = koinInject()
-
-    var vpnData by remember {
-        mutableStateOf<VpnDataResponse?>(null)
-    }
-
-    val state by viewModel.allVpnData.collectAsState()
-
-    val isConnected by viewModel.isConnected.collectAsState()
-
-    when (state) {
-        is ResultState.Error -> {
-            isLoading = false
-            val error = (state as ResultState.Error).error
-            Text(text = error.toString())
-        }
-
-        ResultState.Loading -> {
-            isLoading = true
-        }
-
-        is ResultState.Success -> {
-            isLoading = false
-            val success = (state as ResultState.Success).success
-            vpnData = success
-        }
-    }
+    val isConnected = true
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0XFF2e2e3d)),
+            .background(Color(0xFF2E2E3D)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(id = R.drawable.cover),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(0.7f)
+                modifier = Modifier.fillMaxSize()
             )
 
             Image(
                 painter = painterResource(id = R.drawable.cover),
-                contentDescription = "",
+                contentDescription = null,
                 contentScale = ContentScale.Crop,
-                colorFilter = ColorFilter.tint(Color.LightGray.copy(alpha = 0.20f)),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                colorFilter = ColorFilter.tint(Color.LightGray.copy(0.30f))
             )
 
             Column(
@@ -122,17 +107,16 @@ fun HomeScreen() {
                     verticalAlignment = Alignment.Top,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Box(
+                    IconButton(
+                        onClick = { /* Handle Menu Click */ },
                         modifier = Modifier
                             .clip(RoundedCornerShape(5.dp))
-                            .width(35.dp)
-                            .height(30.dp)
-                            .background(Color(0XFF3a3a4d)),
-                        contentAlignment = Alignment.Center
+                            .size(40.dp)
+                            .background(Color(0xFF3A3A4D))
                     ) {
                         Icon(
                             imageVector = Icons.Default.Menu,
-                            contentDescription = "",
+                            contentDescription = "Menu",
                             tint = Color.White
                         )
                     }
@@ -144,14 +128,11 @@ fun HomeScreen() {
                         color = Color.White
                     )
 
-
                     Image(
                         painter = painterResource(id = R.drawable.premium),
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
+                        contentDescription = "Premium",
                         modifier = Modifier.size(40.dp)
                     )
-
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -167,33 +148,28 @@ fun HomeScreen() {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 28.dp, end = 28.dp)
+                        .padding(horizontal = 28.dp)
                         .height(90.dp)
                         .border(
                             BorderStroke(1.dp, color = Color.LightGray),
                             shape = RoundedCornerShape(12.dp)
-                        ), contentAlignment = Alignment.Center
+                        ),
+                    contentAlignment = Alignment.Center
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(10.dp),
-                        horizontalArrangement = Arrangement.SpaceAround,
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Box(
+                        Image(
+                            painter = painterResource(id = R.drawable.flag_of_the_united_states),
+                            contentDescription = "Flag",
                             modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .width(63.dp)
-                                .height(75.dp)
-                                .background(Color(0XFF394360)), contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.flag_of_the_united_states),
-                                contentDescription = "",
-                                contentScale = ContentScale.Crop
-                            )
-                        }
+                                .size(60.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                        )
 
                         Column(
                             modifier = Modifier.wrapContentHeight(),
@@ -201,24 +177,107 @@ fun HomeScreen() {
                             horizontalAlignment = Alignment.Start
                         ) {
                             Text(
-                                text = "United State",
+                                text = "United States",
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White
                             )
                             Text(
-                                text = "IP 37.1 20.202.186",
+                                text = "IP: 37.1.20.202.186",
                                 fontSize = 13.sp,
                                 color = Color.LightGray
                             )
-
                         }
 
                         Icon(
-                            imageVector = Icons.Default.ArrowBackIosNew,
+                            imageVector = Icons.Default.ArrowForwardIos,
+                            contentDescription = "Change Server",
+                            tint = Color.White
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Default.Download,
+                            contentDescription = "Download Speed",
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Download",
+                            color = Color.Gray,
+                            fontSize = 12.sp
+                        )
+                        Text(
+                            text = "245 KB/s",
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Default.Upload,
+                            contentDescription = "Upload Speed",
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Upload",
+                            color = Color.Gray,
+                            fontSize = 12.sp
+                        )
+                        Text(
+                            text = "176 KB/s",
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(topStart = 110.dp, topEnd = 110.dp))
+                        .fillMaxWidth()
+                        .height(440.dp)
+                        .background(Color(0XFF3d3d4d)), contentAlignment = Alignment.Center
+                ) {
+                    Spacer(modifier = Modifier.height(40.dp))
+                    GlowingPowerButton()
+
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.BottomCenter),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Security,
                             contentDescription = "",
-                            tint = Color.White,
-                            modifier = Modifier.rotate(180f)
+                            tint = if (isConnected) Color.Green else Color.Red, modifier = Modifier
+                                .padding(bottom = 11.dp)
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Text(
+                            text = if (isConnected) "Connected" else "Disconnected",
+                            fontSize = 18.sp,
+                            color = if (isConnected) Color.Green else Color.Red,
+                            modifier = Modifier
+                                .padding(bottom = 11.dp)
                         )
                     }
                 }
