@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,18 +19,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.VpnKey
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
@@ -53,6 +64,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.example.vpn.R
 import com.example.vpn.domain.model.vpn.VpnDataResponse
 import kotlinx.coroutines.launch
@@ -62,37 +74,82 @@ import org.koin.compose.rememberCurrentKoinScope
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen() {
-    var isLoading by remember { mutableStateOf(false) }
-    var vpnData by remember { mutableStateOf<VpnDataResponse?>(null) }
-    val isConnected = true
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet(drawerContainerColor = Color(0XFF2f2f3e).copy(0.95f)) {
+            ModalDrawerSheet(
+                modifier = Modifier.fillMaxHeight(),
+                drawerContainerColor = Color(0XFF2f2f3e).copy(0.95f)
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(vertical = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(horizontal = 16.dp, vertical = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    DrawerMenuItem(
-                        icon = Icons.Default.VpnKey,
-                        label = "VPN",
-                        onClick = {}
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        ProfileSection()
 
-                    DrawerMenuItem(
-                        icon = Icons.Default.PrivacyTip,
-                        label = "Privacy Policy",
-                        onClick = {}
-                    )
+                        Spacer(modifier = Modifier.height(24.dp))
 
-                    Spacer(modifier = Modifier.height(16.dp))
 
+                        DrawerMenuItem(
+                            icon = Icons.Default.AccountCircle,
+                            label = "My Account",
+                            onClick = { /* Handle click */ }
+                        )
+                        DrawerMenuItem(
+                            icon = Icons.Default.Tune,
+                            label = "Split Tunneling",
+                            onClick = { /* Handle click */ }
+                        )
+                        DrawerMenuItem(
+                            icon = Icons.Default.Speed,
+                            label = "Speed Test",
+                            onClick = { /* Handle click */ }
+                        )
+                        DrawerMenuItem(
+                            icon = Icons.Default.Settings,
+                            label = "Settings",
+                            onClick = { /* Handle click */ }
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+
+                        HorizontalDivider(
+                            color = Color.LightGray.copy(alpha = 0.40f),
+                            modifier = Modifier.padding(start = 7.dp, end = 7.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+                        DrawerMenuItem(
+                            icon = Icons.Default.HelpOutline,
+                            label = "FAQ",
+                            onClick = { /* Handle click */ }
+                        )
+                        DrawerMenuItem(
+                            icon = Icons.Default.Share,
+                            label = "Share",
+                            onClick = { /* Handle click */ }
+                        )
+                    }
+
+                    Button(
+                        onClick = { },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFFA726)
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp), shape = RoundedCornerShape(9.dp)
+                    ) {
+                        Text(text = "Upgrade to Premium", color = Color.White)
+                    }
                 }
             }
         }
@@ -109,38 +166,57 @@ fun HomeScreen() {
                 contentAlignment = Alignment.Center
             ) {
                 BackgroundImage()
-                MainContent(isConnected = isConnected, drawerState)
+                MainContent(isConnected = true, drawerState)
             }
         }
     }
-
-
 }
 
+@Composable
+fun ProfileSection() {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter("https://example.com/profile.jpg"),
+            contentDescription = "Profile picture",
+            modifier = Modifier
+                .size(80.dp)
+                .clip(CircleShape)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Jackson David",
+            color = Color.White,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+
+        Text(text = "jacksondavid@gmail.com", color = Color.Gray, fontSize = 14.sp)
+    }
+}
 
 @Composable
 fun DrawerMenuItem(icon: ImageVector, label: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(16.dp),
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp, horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = label,
+            contentDescription = null,
             tint = Color.White,
             modifier = Modifier.size(24.dp)
         )
-
         Spacer(modifier = Modifier.width(16.dp))
-
-        Text(
-            text = label,
-            color = Color.White,
-            fontSize = 16.sp
-        )
+        Text(text = label, color = Color.White, fontSize = 16.sp)
     }
 }
 
