@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.vpn.di.appModule
-import com.example.vpn.presentation.ui.screens.home.HomeScreen
+import com.example.vpn.presentation.ui.navigation.Navigation
 import com.example.vpn.ui.theme.VpnTheme
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             VpnTheme {
-                HomeScreen()
+                Navigation()
             }
         }
     }

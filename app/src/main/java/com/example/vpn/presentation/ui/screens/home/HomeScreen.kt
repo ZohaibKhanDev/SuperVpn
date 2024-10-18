@@ -1,7 +1,10 @@
 package com.example.vpn.presentation.ui.screens.home
 
 import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -59,13 +62,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.vpn.R
+import com.example.vpn.presentation.ui.navigation.Screens
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
     val context = LocalContext.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val pakagename = context.applicationInfo.packageName
@@ -98,19 +103,31 @@ fun HomeScreen() {
                     DrawerMenuItem(icon = Icons.Default.Share, label = "Share", onClick = {
                         context.startActivity(shareIntent)
                     })
+
                     Spacer(modifier = Modifier.height(14.dp))
 
-                    DrawerMenuItem(icon = Icons.Default.Stars, label = "Rate us") {}
+                    DrawerMenuItem(icon = Icons.Default.Stars, label = "Rate us", onClick = {
+                        openAppInPlayStore(context)
+                    })
+
                     Spacer(modifier = Modifier.height(14.dp))
-                    DrawerMenuItem(icon = Icons.Default.HelpOutline, label = "FAQ", onClick = { })
+
+                    DrawerMenuItem(
+                        icon = Icons.Default.HelpOutline,
+                        label = "FAQ",
+                        onClick = { navController.navigate(Screens.Privacy_Policy.route) })
                     Spacer(modifier = Modifier.height(14.dp))
+
                     DrawerMenuItem(
                         icon = Icons.Default.PrivacyTip,
                         label = "Privacy Policy",
                         onClick = { })
                     Spacer(modifier = Modifier.height(14.dp))
 
-                    DrawerMenuItem(icon = Icons.Default.Settings, label = "Settings", onClick = { })
+                    DrawerMenuItem(
+                        icon = Icons.Default.Settings,
+                        label = "Settings",
+                        onClick = { navController.navigate(Screens.Privacy_Policy.route) })
                     Spacer(modifier = Modifier.height(14.dp))
                     DrawerMenuItem(icon = Icons.Default.Info, label = appVersion, onClick = { })
                 }
@@ -427,4 +444,22 @@ fun ConnectionStatusRow(isConnected: Boolean) {
 
 }
 
+
+fun openAppInPlayStore(context: Context) {
+    try {
+        context.startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("market://details?id=" + context.packageName)
+            )
+        )
+    } catch (e: ActivityNotFoundException) {
+        context.startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://play.google.com/store/apps/details?id=" + context.packageName)
+            )
+        )
+    }
+}
 
