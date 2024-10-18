@@ -1,6 +1,7 @@
 package com.example.vpn.presentation.ui.screens.home
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,26 +23,22 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Speed
-import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material.icons.filled.Upload
-import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
@@ -49,11 +46,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,105 +54,87 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
 import com.example.vpn.R
-import com.example.vpn.domain.model.vpn.VpnDataResponse
 import kotlinx.coroutines.launch
-import org.koin.compose.rememberCurrentKoinScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen() {
+    val context = LocalContext.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val pakagename = context.applicationInfo.packageName
+    val sendIntent = Intent(Intent.ACTION_SEND).apply {
+        putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=$pakagename")
+        type = "text/plain"
+    }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet(
-                modifier = Modifier.fillMaxHeight(),
-                drawerContainerColor = Color(0XFF2f2f3e).copy(0.95f)
+    val shareIntent = Intent.createChooser(sendIntent, null)
+    val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+    val appVersion = packageInfo.versionName
+
+    ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
+        ModalDrawerSheet(
+            modifier = Modifier.fillMaxHeight(),
+            drawerContainerColor = Color(0XFF2f2f3e).copy(0.95f)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp, vertical = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(40.dp)
             ) {
-                Column(
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    ProfileSection()
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    DrawerMenuItem(icon = Icons.Default.Share, label = "Share", onClick = {
+                        context.startActivity(shareIntent)
+                    })
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    DrawerMenuItem(icon = Icons.Default.Stars, label = "Rate us") {}
+                    Spacer(modifier = Modifier.height(14.dp))
+                    DrawerMenuItem(icon = Icons.Default.HelpOutline, label = "FAQ", onClick = { })
+                    Spacer(modifier = Modifier.height(14.dp))
+                    DrawerMenuItem(
+                        icon = Icons.Default.PrivacyTip,
+                        label = "Privacy Policy",
+                        onClick = { })
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    DrawerMenuItem(icon = Icons.Default.Settings, label = "Settings", onClick = { })
+                    Spacer(modifier = Modifier.height(14.dp))
+                    DrawerMenuItem(icon = Icons.Default.Info, label = appVersion, onClick = { })
+                }
+
+                Button(
+                    onClick = { },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFFA726)
+                    ),
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp, vertical = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceBetween
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .height(48.dp),
+                    shape = RoundedCornerShape(15.dp)
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        ProfileSection()
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        DrawerMenuItem(
-                            icon = Icons.Default.AccountCircle,
-                            label = "My Account",
-                            onClick = { }
-                        )
-                        DrawerMenuItem(
-                            icon = Icons.Default.Tune,
-                            label = "Split Tunneling",
-                            onClick = { }
-                        )
-                        DrawerMenuItem(
-                            icon = Icons.Default.Speed,
-                            label = "Speed Test",
-                            onClick = { }
-                        )
-                        DrawerMenuItem(
-                            icon = Icons.Default.Settings,
-                            label = "Settings",
-                            onClick = { }
-                        )
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
-
-                        HorizontalDivider(
-                            color = Color.LightGray.copy(alpha = 0.40f),
-                            modifier = Modifier.padding(start = 7.dp, end = 7.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        DrawerMenuItem(
-                            icon = Icons.Default.HelpOutline,
-                            label = "FAQ",
-                            onClick = { }
-                        )
-                        DrawerMenuItem(
-                            icon = Icons.Default.Share,
-                            label = "Share",
-                            onClick = { }
-                        )
-                    }
-
-                    Button(
-                        onClick = { },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFFFA726)
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                            .height(48.dp),
-                        shape = RoundedCornerShape(15.dp)
-                    ) {
-                        Text(
-                            text = "Upgrade to Premium",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    Text(
+                        text = "Upgrade to Premium",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
-    ) {
+    }) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -168,8 +143,7 @@ fun HomeScreen() {
         ) {
 
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
             ) {
                 BackgroundImage()
                 MainContent(isConnected = true, drawerState)
@@ -181,8 +155,7 @@ fun HomeScreen() {
 @Composable
 fun ProfileSection() {
     Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
             painter = painterResource(id = R.drawable.person),
@@ -292,17 +265,12 @@ fun TopBar(drawerState: DrawerState) {
                 .background(Color(0xFF3A3A4D))
         ) {
             Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Menu",
-                tint = Color.White
+                imageVector = Icons.Default.Menu, contentDescription = "Menu", tint = Color.White
             )
         }
 
         Text(
-            text = "VPNite",
-            fontSize = 23.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
+            text = "VPNite", fontSize = 23.sp, fontWeight = FontWeight.Bold, color = Color.White
         )
 
         Image(
@@ -317,10 +285,7 @@ fun TopBar(drawerState: DrawerState) {
 fun ConnectionStatus() {
     Text(text = "Connecting Time", fontSize = 12.sp, color = Color.LightGray)
     Text(
-        text = "00:30:26",
-        fontSize = 34.sp,
-        fontWeight = FontWeight.Bold,
-        color = Color.White
+        text = "00:30:26", fontSize = 34.sp, fontWeight = FontWeight.Bold, color = Color.White
     )
 }
 
@@ -332,10 +297,8 @@ fun ServerInfo() {
             .padding(horizontal = 28.dp)
             .height(90.dp)
             .border(
-                BorderStroke(1.dp, color = Color.LightGray),
-                shape = RoundedCornerShape(12.dp)
-            ),
-        contentAlignment = Alignment.Center
+                BorderStroke(1.dp, color = Color.LightGray), shape = RoundedCornerShape(12.dp)
+            ), contentAlignment = Alignment.Center
     ) {
         Row(
             modifier = Modifier
@@ -364,9 +327,7 @@ fun ServerInfo() {
                     color = Color.White
                 )
                 Text(
-                    text = "IP: 37.1.20.202.186",
-                    fontSize = 13.sp,
-                    color = Color.LightGray
+                    text = "IP: 37.1.20.202.186", fontSize = 13.sp, color = Color.LightGray
                 )
             }
 
@@ -395,21 +356,14 @@ fun SpeedInfo() {
 fun SpeedColumn(label: String, speed: String, icon: ImageVector) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
-            imageVector = icon,
-            contentDescription = "$label Speed",
-            tint = Color.White
+            imageVector = icon, contentDescription = "$label Speed", tint = Color.White
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = label,
-            color = Color.Gray,
-            fontSize = 12.sp
+            text = label, color = Color.Gray, fontSize = 12.sp
         )
         Text(
-            text = speed,
-            color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium
+            text = speed, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium
         )
     }
 }
