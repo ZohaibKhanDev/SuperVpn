@@ -33,7 +33,6 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material.icons.filled.Upload
@@ -122,12 +121,6 @@ fun HomeScreen(navController: NavController) {
                         icon = Icons.Default.PrivacyTip,
                         label = "Privacy Policy",
                         onClick = { navController.navigate(Screens.Privacy_Policy.route) })
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    DrawerMenuItem(
-                        icon = Icons.Default.Settings,
-                        label = "Settings",
-                        onClick = { })
                     Spacer(modifier = Modifier.height(14.dp))
                     DrawerMenuItem(icon = Icons.Default.Info, label = appVersion, onClick = { })
                 }
