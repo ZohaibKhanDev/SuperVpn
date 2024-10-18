@@ -176,6 +176,7 @@ fun MainContent(isConnected: Boolean, drawerState: DrawerState) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
+
         ConnectionStatus()
 
         ServerInfo()
