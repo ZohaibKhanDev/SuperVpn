@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
@@ -91,31 +92,29 @@ fun HomeScreen() {
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
                         ProfileSection()
 
                         Spacer(modifier = Modifier.height(24.dp))
 
-
                         DrawerMenuItem(
                             icon = Icons.Default.AccountCircle,
                             label = "My Account",
-                            onClick = { /* Handle click */ }
+                            onClick = { }
                         )
                         DrawerMenuItem(
                             icon = Icons.Default.Tune,
                             label = "Split Tunneling",
-                            onClick = { /* Handle click */ }
+                            onClick = { }
                         )
                         DrawerMenuItem(
                             icon = Icons.Default.Speed,
                             label = "Speed Test",
-                            onClick = { /* Handle click */ }
+                            onClick = { }
                         )
                         DrawerMenuItem(
                             icon = Icons.Default.Settings,
                             label = "Settings",
-                            onClick = { /* Handle click */ }
+                            onClick = { }
                         )
 
                         Spacer(modifier = Modifier.height(20.dp))
@@ -127,15 +126,16 @@ fun HomeScreen() {
                         )
 
                         Spacer(modifier = Modifier.height(10.dp))
+
                         DrawerMenuItem(
                             icon = Icons.Default.HelpOutline,
                             label = "FAQ",
-                            onClick = { /* Handle click */ }
+                            onClick = { }
                         )
                         DrawerMenuItem(
                             icon = Icons.Default.Share,
                             label = "Share",
-                            onClick = { /* Handle click */ }
+                            onClick = { }
                         )
                     }
 
@@ -146,9 +146,15 @@ fun HomeScreen() {
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp), shape = RoundedCornerShape(9.dp)
+                            .padding(vertical = 8.dp)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(15.dp)
                     ) {
-                        Text(text = "Upgrade to Premium", color = Color.White)
+                        Text(
+                            text = "Upgrade to Premium",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
@@ -179,11 +185,12 @@ fun ProfileSection() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = rememberAsyncImagePainter("https://example.com/profile.jpg"),
+            painter = painterResource(id = R.drawable.person),
             contentDescription = "Profile picture",
             modifier = Modifier
                 .size(80.dp)
                 .clip(CircleShape)
+                .border(2.dp, Color.DarkGray, CircleShape),
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -194,7 +201,6 @@ fun ProfileSection() {
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
         )
-
 
         Text(text = "jacksondavid@gmail.com", color = Color.Gray, fontSize = 14.sp)
     }
@@ -219,7 +225,6 @@ fun DrawerMenuItem(icon: ImageVector, label: String, onClick: () -> Unit) {
         Text(text = label, color = Color.White, fontSize = 16.sp)
     }
 }
-
 
 @Composable
 fun BackgroundImage() {
