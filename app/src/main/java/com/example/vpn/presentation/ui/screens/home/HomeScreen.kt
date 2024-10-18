@@ -399,8 +399,6 @@ fun ServerInfo() {
     }
 }
 
-
-
 @Composable
 fun SpeedInfo() {
     Row(
