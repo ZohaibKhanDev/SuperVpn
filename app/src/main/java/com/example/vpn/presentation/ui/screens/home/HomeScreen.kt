@@ -48,7 +48,12 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,13 +68,47 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.vpn.R
+import com.example.vpn.domain.model.vpn.VpnDataResponse
+import com.example.vpn.domain.model.vpn.VpnDataResponseItem
+import com.example.vpn.domain.usecase.ResultState
 import com.example.vpn.presentation.ui.navigation.Screens
+import com.example.vpn.presentation.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(navController: NavController) {
+    val viewModel: MainViewModel = koinInject()
+
+    var isLoading by remember {
+        mutableStateOf(false)
+    }
+    var vpnDataResponse by remember {
+        mutableStateOf<VpnDataResponse?>(null)
+    }
+
+    val state by viewModel.allVpnData.collectAsState()
+
+    when (state) {
+        is ResultState.Error -> {
+            isLoading = false
+            val error = (state as ResultState.Error).error
+            Text(text = error.toString())
+        }
+
+        ResultState.Loading -> {
+            isLoading = true
+        }
+
+        is ResultState.Success -> {
+            isLoading = false
+            val success = (state as ResultState.Success).success
+            vpnDataResponse = success
+        }
+    }
+
     val context = LocalContext.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val pakagename = context.applicationInfo.packageName
@@ -77,90 +116,94 @@ fun HomeScreen(navController: NavController) {
         putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=$pakagename")
         type = "text/plain"
     }
-
     val shareIntent = Intent.createChooser(sendIntent, null)
     val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
     val appVersion = packageInfo.versionName
 
-    ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
-        ModalDrawerSheet(
-            modifier = Modifier.fillMaxHeight(),
-            drawerContainerColor = Color(0XFF2f2f3e).copy(0.95f)
-        ) {
+
+        ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
+            ModalDrawerSheet(
+                modifier = Modifier.fillMaxHeight(),
+                drawerContainerColor = Color(0XFF2f2f3e).copy(0.95f)
+            ) {
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp, vertical = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(40.dp)
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        ProfileSection()
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        DrawerMenuItem(icon = Icons.Default.Share, label = "Share", onClick = {
+                            context.startActivity(shareIntent)
+                        })
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        DrawerMenuItem(icon = Icons.Default.Stars, label = "Rate us", onClick = {
+                            openAppInPlayStore(context)
+                        })
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        DrawerMenuItem(
+                            icon = Icons.Default.HelpOutline,
+                            label = "FAQ",
+                            onClick = { navController.navigate(Screens.Faq.route) })
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        DrawerMenuItem(
+                            icon = Icons.Default.PrivacyTip,
+                            label = "Privacy Policy",
+                            onClick = { navController.navigate(Screens.Privacy_Policy.route) })
+                        Spacer(modifier = Modifier.height(14.dp))
+                        DrawerMenuItem(icon = Icons.Default.Info, label = appVersion, onClick = { })
+                    }
+
+                    Button(
+                        onClick = { },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFFA726)
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text(
+                            text = "Upgrade to Premium",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }) {
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(40.dp)
+                    .background(Color(0xFF2E2E3D)),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    ProfileSection()
 
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    DrawerMenuItem(icon = Icons.Default.Share, label = "Share", onClick = {
-                        context.startActivity(shareIntent)
-                    })
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    DrawerMenuItem(icon = Icons.Default.Stars, label = "Rate us", onClick = {
-                        openAppInPlayStore(context)
-                    })
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    DrawerMenuItem(
-                        icon = Icons.Default.HelpOutline,
-                        label = "FAQ",
-                        onClick = { navController.navigate(Screens.Faq.route) })
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    DrawerMenuItem(
-                        icon = Icons.Default.PrivacyTip,
-                        label = "Privacy Policy",
-                        onClick = { navController.navigate(Screens.Privacy_Policy.route) })
-                    Spacer(modifier = Modifier.height(14.dp))
-                    DrawerMenuItem(icon = Icons.Default.Info, label = appVersion, onClick = { })
-                }
-
-                Button(
-                    onClick = { },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFFA726)
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .height(48.dp),
-                    shape = RoundedCornerShape(15.dp)
+                Box(
+                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "Upgrade to Premium",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
+                    BackgroundImage()
+                    MainContent(isConnected = true, drawerState)
                 }
             }
         }
-    }) {
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFF2E2E3D)),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
 
-            Box(
-                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-            ) {
-                BackgroundImage()
-                MainContent(isConnected = true, drawerState)
-            }
-        }
-    }
+
 }
 
 @Composable
@@ -231,7 +274,10 @@ fun BackgroundImage() {
 }
 
 @Composable
-fun MainContent(isConnected: Boolean, drawerState: DrawerState) {
+fun MainContent(
+    isConnected: Boolean,
+    drawerState: DrawerState,
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -255,7 +301,7 @@ fun MainContent(isConnected: Boolean, drawerState: DrawerState) {
 }
 
 @Composable
-fun TopBar(drawerState: DrawerState) {
+fun TopBar(drawerState: DrawerState,) {
     val scope = rememberCoroutineScope()
     Row(
         modifier = Modifier
@@ -332,13 +378,15 @@ fun ServerInfo() {
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = "United States",
+                    text = "United State",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.White
                 )
                 Text(
-                    text = "IP: 37.1.20.202.186", fontSize = 13.sp, color = Color.LightGray
+                    text = "IP: 219.100.37.16",
+                    fontSize = 13.sp,
+                    color = Color.LightGray
                 )
             }
 
@@ -358,8 +406,8 @@ fun SpeedInfo() {
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        SpeedColumn("Download", "245 KB/s", Icons.Default.Download)
-        SpeedColumn("Upload", "176 KB/s", Icons.Default.Upload)
+        SpeedColumn("Download", "900 KB/s", Icons.Default.Download)
+        SpeedColumn("Upload", "500 KB/s", Icons.Default.Upload)
     }
 }
 

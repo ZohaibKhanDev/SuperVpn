@@ -21,8 +21,12 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = repository.getVpnData()
-                _allVpnData.value = ResultState.Success(response)
-                _isConnected.value = true
+                if (response != null) {
+                    _allVpnData.value = ResultState.Success(response)
+                    _isConnected.value = true
+                } else {
+                    _allVpnData.value = ResultState.Error(Exception("No VPN data found"))
+                }
             } catch (e: Exception) {
                 _allVpnData.value = ResultState.Error(e)
             }
@@ -31,10 +35,8 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
 
     fun disconnectVpn() {
         viewModelScope.launch {
-            try {
-                _isConnected.value = false
-            } catch (e: Exception) {
-            }
+            _isConnected.value = false
+            _allVpnData.value = ResultState.Loading // Reset the VPN data
         }
     }
 }
