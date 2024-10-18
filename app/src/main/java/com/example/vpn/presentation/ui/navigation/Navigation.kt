@@ -5,7 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.vpn.presentation.ui.screens.FaqScreen
-import com.example.vpn.presentation.ui.screens.Privacy_Policy
+import com.example.vpn.presentation.ui.screens.PrivacyPolicyScreen
 import com.example.vpn.presentation.ui.screens.home.HomeScreen
 
 @Composable
@@ -22,7 +22,7 @@ fun Navigation() {
         }
 
         composable(Screens.Privacy_Policy.route) {
-            Privacy_Policy(navController = navController)
+            PrivacyPolicyScreen(navController = navController)
         }
     }
 }

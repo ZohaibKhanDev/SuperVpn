@@ -115,19 +115,19 @@ fun HomeScreen(navController: NavController) {
                     DrawerMenuItem(
                         icon = Icons.Default.HelpOutline,
                         label = "FAQ",
-                        onClick = { navController.navigate(Screens.Privacy_Policy.route) })
+                        onClick = { navController.navigate(Screens.Faq.route) })
                     Spacer(modifier = Modifier.height(14.dp))
 
                     DrawerMenuItem(
                         icon = Icons.Default.PrivacyTip,
                         label = "Privacy Policy",
-                        onClick = { })
+                        onClick = { navController.navigate(Screens.Privacy_Policy.route) })
                     Spacer(modifier = Modifier.height(14.dp))
 
                     DrawerMenuItem(
                         icon = Icons.Default.Settings,
                         label = "Settings",
-                        onClick = { navController.navigate(Screens.Privacy_Policy.route) })
+                        onClick = { })
                     Spacer(modifier = Modifier.height(14.dp))
                     DrawerMenuItem(icon = Icons.Default.Info, label = appVersion, onClick = { })
                 }
